@@ -26,7 +26,7 @@ python rank.py
 
 ---
 
-## What Makes v4 Better?
+## What Makes it Better?
 
 Our system specifically solves for the "Read between the lines" and "Anti-Trap" requirements in the Hackathon Specification:
 
