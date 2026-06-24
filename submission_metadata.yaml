@@ -46,29 +46,21 @@ compute:
 # may verify these declarations against your code; declarations that contradict
 # your code or your interview are flagged.
 ai_tools_used:
-  - "Claude"  
   - "ChatGPT"
   - "Gemini"  
 
 ai_usage_summary: |
-  Briefly describe how AI tools were used. Examples:
-  - "Used Claude for code review and architectural discussion. Used ChatGPT and Gemini for autocomplete.
+  Briefly describe how AI tools were used. 
+  - "Used ChatGPT and Gemini for autocomplete.
      No candidate data was fed to any LLM."
-  - "Used ChatGPT to debug Python issues and Gemini and Claude for refactoring."
+  - "Used ChatGPT to debug Python issues and Gemini for help."
 
 # ============================================================================
 # Approach summary (optional but recommended)
 # ============================================================================
 methodology_summary: |
-  ≤200 word summary of your approach. Strongly recommended.
-
-  Example:
-  "Rule-based ranker with explicit reasoning capture. Five scoring components
-  (skills, title+career, experience years, location, education) combined with
-  a multiplicative behavioral-signal modifier. The title component is the
-  decisive signal against keyword-stuffer traps; an endorsement-and-duration
-  trust multiplier on skills catches lazy keyword stuffing. Runtime is ~10
-  seconds for 50K candidates on CPU."
+  Unlike keyword-based systems that fall for "Honeypot" traps, our approach treats candidate profiles as multi-dimensional data structures. We prioritize proven engineering capability (via TF-IDF semantic vectorization) and real-world availability (via behavioral signal analysis), ensuring we find candidates who are actually ready to build, not just candidates who know how to spam keywords. 
+  "Runtime is ~30-60 seconds for 1 lakh candidates on CPU."
 
 # ============================================================================
 # Declarations

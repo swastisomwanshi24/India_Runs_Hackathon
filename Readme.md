@@ -1,37 +1,265 @@
-# Redrob Hackathon: Intelligent Candidate Discovery & Ranking Challenge
+# Redrob Hackathon - Candidate Ranking System Submission
 
-## Project Overview
-This project is our submission for the Redrob Hackathon. The objective is to build an intelligent candidate ranking system that evaluates a pool of 100,000 synthetic candidates against a highly specific "Senior AI Engineer" job description.
+## Quick Start - Reproduce Submission
 
-Rather than simple keyword matching, the challenge emphasizes interpreting real-world hiring constraints: identifying "shippers" over pure researchers, recognizing relevant experience even without modern buzzwords, avoiding "honeypot" profiles (e.g., keyword-stuffed irrelevant titles), and correctly applying behavioral signals (e.g., recent logins, recruiter response rates, notice periods).
+### Single Command Reproduction
 
-## What We Need to Do
-1. **Analyze the Job Description & Candidates:** 
-   - Parse the `job_description.docx` to extract hard filters (must have: production vector DBs, embedding retrieval, python, eval frameworks) and disqualifiers (pure research, no code in 18 months, only consulting).
-   - Evaluate candidates using the data schema and the 23 behavioral signals defined in `redrob_signals_doc.docx`.
-2. **Build a Time-and-Resource Efficient Ranker:**
-   - **Constraints:** The ranking step must run in under 5 minutes on a CPU-only machine with ≤16GB RAM and NO external network/API calls. Intermediate disk usage must be ≤5GB.
-   - Any heavy computation (e.g., generating dense embeddings) must be done in a pre-compute phase. The final ranking step must be rapid and offline.
-3. **Handle Traps and Honeypots:**
-   - The dataset contains ~80 honeypots (impossible combinations of experience/age). Submissions with >10% honeypots in the top 100 will be disqualified.
-   - We must weigh behavioral signals heavily (e.g., if a candidate has a 5% recruiter response rate or hasn't logged in recently, their score must be down-weighted).
-4. **Produce the Submission Files:**
-   - Generate a single `team_xxx.csv` file containing EXACTLY the top 100 candidates ranked 1-100, including their score and a 1-2 sentence justification/reasoning for each choice.
-   - Validate the CSV format using the provided `validate_submission.py`.
-   - Prepare the `submission_metadata.yaml` with our details, GitHub repository link, and a sandbox demo link (e.g., Docker, HuggingFace Spaces, or Colab) that can rank a small subset of candidates correctly.
+```bash
+python rank.py --candidates ./data/raw/candidates.jsonl --out ./data/final/submission.csv
+```
 
-## Our Implementation Plan
-1. **Data Preprocessing & Pre-computation:**
-   - Build a script to parse `candidates.jsonl.gz`.
-   - Extract key features: total relevant experience, product-company presence, keyword flags, and all behavioral signals.
-   - Since network API calls are forbidden during evaluation, we will pre-compute any necessary vectors or indices offline or use a fast local heuristics/TF-IDF system combined with strong rule-based filters.
-2. **Scoring Logic:**
-   - **Base Score:** Match JD technical requirements using BM25/TF-IDF or a lightweight local `sentence-transformers` model.
-   - **Multipliers:** Apply boost factors based on `profile_completeness_score`, `last_active_date`, and `recruiter_response_rate`.
-   - **Penalties:** Implement hard penalties for "pure research" titles, honeypot properties (e.g. excessive years of experience for recent technologies), and high notice period > 30 days.
-3. **Reasoning Generation:**
-   - Automatically compile the reasoning string by templating the specific facts extracted from the candidate profile (e.g., "7 years applied ML experience with Pinecone; 90% recruiter response rate").
-4. **Final Packaging:**
-   - Wrap the solution into a reproducible Python script.
-   - Build an easy-to-use Dockerfile or HuggingFace Space to serve as our verifiable "sandbox".
-   - Validate the CSV and finalize metadata before the deadline.
+This command will:
+1. Load 100,000 candidates from `candidates.jsonl`
+2. Apply hard filters (experience, location, role type)
+3. Compute text matching, tech stack, and behavioral scores
+4. Rank top 100 candidates
+5. Generate `submission.csv` in the required format
+
+**Expected Runtime**: ~30-60 seconds on a standard laptop (CPU only)
+
+
+---
+
+## Validation
+
+After generating the submission, validate it:
+
+```bash
+python validate_submission.py data/final/submission.csv
+```
+
+Expected output:
+```
+Submission is valid.
+```
+
+---
+
+## What the System Does
+
+### 1. Hard Filters (Pass/Fail)
+-  **Experience**: 5-9 years
+-  **Location**: Pune or Noida (or willing to relocate)
+-  **Role Type**: Excludes non-tech roles (marketing, sales, HR) with >15 skills
+
+**Result**: ~9,946 candidates pass filters from 100,000 total
+
+### 2. Scoring System (Weighted Formula)
+
+```
+Final Score = (Text Match × 0.4) + (Tech Stack × 0.3) + (Behavioral × 0.3)
+```
+
+#### Text Match Score (40% weight)
+- Uses TF-IDF vectorization + cosine similarity
+- Compares candidate headline & summary against job description
+- Looks for: "embeddings", "retrieval", "ranking", "LLMs", "fine-tuning", etc.
+
+#### Tech Stack Score (30% weight)
+- Checks for 6 must-have skills:
+  - Python
+  - Spark
+  - Airflow
+  - LLM
+  - Embeddings
+  - Ranking
+- Score = (matched skills) / 6
+
+#### Behavioral Score (30% weight)
+Based on `redrob_signals`:
+- **Recruiter response rate** < 30% → penalty -0.3
+- **Profile completeness** < 50% → penalty -0.2
+- **Notice period** > 60 days → penalty -0.1
+
+### 3. Ranking & Tie-Breaking
+- Sort by `score` (descending)
+- Ties broken by `candidate_id` (ascending)
+- Select top 100
+
+---
+
+## File Structure
+
+```
+India_Runs_Hackathon/
+├── rank.py                     # Main ranking script (reproduction command)
+├── validate_submission.py      # Wrapper for validator
+├── notebook/
+│   ├── main.ipynb             # Jupyter notebook version (development)
+│   └── validate_submission.py # Actual validator logic
+├── data/
+│   ├── raw/
+│   │   ├── candidates.jsonl   # 100K candidates (input)
+│   │   └── extract.txt        # Project requirements
+│   └── final/
+│       └── submission.csv     # Top 100 ranked candidates (output)
+└── README_REPRODUCTION.md     # This file
+```
+
+---
+
+## Requirements
+
+### Python Dependencies
+
+```bash
+pip install pandas scikit-learn
+```
+
+Or use requirements.txt:
+
+```txt
+pandas>=1.5.0
+scikit-learn>=1.0.0
+```
+
+### Python Version
+- Python 3.8 or higher
+
+---
+
+## Testing the Reproduction
+
+### Test 1: Run the ranking command
+```bash
+python rank.py --candidates ./data/raw/candidates.jsonl --out ./data/final/submission.csv
+```
+
+**Expected Output**:
+```
+Processing candidates from: ./data/raw/candidates.jsonl
+Output will be saved to: ./data/final/submission.csv
+Step 1: Applying hard filters...
+   9946 candidates passed hard filters
+Step 2: Computing text match scores...
+Step 3: Computing tech stack scores...
+Step 4: Computing final scores...
+Step 5: Sorting candidates...
+Step 6: Selecting top 100 candidates...
+Step 7: Generating reasoning...
+Step 8: Saving submission CSV...
+
+SUCCESS! Submission saved to: ./data/final/submission.csv
+   Total candidates ranked: 100
+   Top score: 0.5238
+   Bottom score: 0.4407
+```
+
+### Test 2: Validate the output
+```bash
+python validate_submission.py data/final/submission.csv
+```
+
+**Expected Output**:
+```
+Submission is valid.
+```
+
+### Test 3: Check output format
+```bash
+head -n 5 data/final/submission.csv
+```
+
+**Expected Format**:
+```csv
+candidate_id,rank,score,reasoning
+CAND_0063138,1,0.5238233655272808,Strong match with 33% tech stack alignment and high behavioral engagement.
+CAND_0009525,2,0.5168092789016747,Strong match with 33% tech stack alignment and high behavioral engagement.
+CAND_0013440,3,0.5133959905186669,Strong match with 33% tech stack alignment and high behavioral engagement.
+...
+```
+
+---
+
+## Submission Format Compliance
+
+Our output meets all requirements from `submission_spec.md`:
+
+| Requirement | Status | Implementation |
+|-------------|--------|----------------|
+| Exactly 100 rows | `.head(100)` |
+| Ranks 1-100 (each once) | `range(1, 101)` |
+| Score non-increasing |  `sort_values(by='score', ascending=False)` |
+| Tie-breaker by candidate_id | `sort_values(by=['score', 'candidate_id'], ascending=[False, True])` |
+| Valid candidate_id format | Uses IDs from input |
+| UTF-8 encoding |  Default pandas CSV writer |
+| Required columns | `['candidate_id', 'rank', 'score', 'reasoning']` |
+
+---
+
+## Performance Characteristics
+
+| Metric | Value |
+|--------|-------|
+| **Runtime** | ~30-60 seconds |
+| **Memory Peak** | ~2-3 GB |
+| **CPU Only** | Yes (no GPU) |
+| **Network Calls** |  None |
+| **Disk I/O** | < 500 MB |
+
+**Compute Constraint Compliance** (from submission_spec.md):
+- Runtime ≤ 5 minutes
+- Memory ≤ 16 GB
+- CPU only (no GPU)
+- No network calls
+
+---
+
+## Troubleshooting
+
+### Issue: "ModuleNotFoundError: No module named 'sklearn'"
+**Solution**: Install dependencies
+```bash
+pip install scikit-learn pandas
+```
+
+### Issue: "FileNotFoundError: candidates.jsonl"
+**Solution**: Ensure you're running from the project root
+```bash
+cd India_Runs_Hackathon
+python rank.py --candidates ./data/raw/candidates.jsonl --out ./data/final/submission.csv
+```
+
+### Issue: "candidates.jsonl.gz not found"
+**Solution**: The script auto-detects both `.jsonl` and `.jsonl.gz`. Ensure one exists in `data/raw/`
+
+### Issue: Validation fails with "score must be non-increasing"
+**Solution**: This should not happen with the current implementation (it sorts properly). If it does, check for manual edits to submission.csv.
+
+---
+
+## Notes for Reviewers
+
+### Design Decisions
+
+1. **Streaming vs Batch Loading**: We stream candidates line-by-line to reduce memory footprint, even though the full dataset fits in memory.
+
+2. **Tie-breaking by candidate_id**: Required by submission spec to ensure deterministic rankings when scores are equal.
+
+3. **Simple reasoning template**: Currently uses a basic template. Can be enhanced with candidate-specific details (see VERIFICATION_SUMMARY.md for suggestions).
+
+4. **Behavioral signal selection**: Uses 3 of 23 available signals (response rate, completeness, notice period) as these are most directly related to candidate availability.
+
+5. **No honeypot detection**: Current implementation doesn't filter honeypot candidates. This is a known enhancement area.
+
+### Reproducibility Guarantee
+
+The system is **fully deterministic**:
+- No random seeds or shuffling
+- Same input → same output (always)
+- Tie-breaking ensures stable ranking
+
+---
+
+## Contact
+
+For questions about this submission, refer to `submission_metadata.yaml`
+
+---
+
+## Related Files
+
+- `VERIFICATION_SUMMARY.md` - Detailed analysis vs requirements
+- `data/raw/extract.txt` - Full project requirements
+- `docs/submission_spec.docx` - Official submission specification
+- `notebook/main.ipynb` - Development notebook (same logic)
