@@ -11,9 +11,8 @@ import argparse
 
 # 1. SETTINGS & PATHS
 parser = argparse.ArgumentParser(description="Rank candidates for Senior AI Engineer role.")
-parser.add_init = False # dummy for structure
 parser.add_argument("--candidates", default=os.path.join('data', 'raw', 'candidates.jsonl'), help="Path to candidates.jsonl")
-parser.add_argument("--out", default=os.path.join('data', 'final', 'submission4.csv'), help="Path to output CSV")
+parser.add_argument("--out", default=os.path.join('data', 'final', 'submission.csv'), help="Path to output CSV")
 args = parser.parse_args()
 
 CANDIDATES_PATH = args.candidates
