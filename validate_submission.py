@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Root-level wrapper for the validator that lives in `notebook/validate_submission.py`.
-Run: python validate_submission.py data/final/submission.csv
+Run: python validate_submission.py data/final/submission4.csv
 """
 import runpy
 from pathlib import Path

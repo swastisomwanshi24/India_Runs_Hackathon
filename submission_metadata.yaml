@@ -21,10 +21,10 @@ team_members:
 github_repo: "https://github.com/swastisomwanshi24/India_Runs_Hackathon.git"
 
 
-sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+sandbox_link: "https://colab.research.google.com/drive/1hAZ3KAsmE1-pmAMmwl3tLYPnC-vufXXc?usp=sharing"
 
 
-reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+reproduce_command: "python rank.py"
 
 # ============================================================================
 # Compute environment
@@ -33,7 +33,7 @@ compute:
   platform: "Lenovo Ideapad Slim 3 , Dell G15"                    
   cpu_cores: 8                                  
   ram_gb: 16                                    
-  python_version: "3.11.4"                      
+  python_version: "3.13.5"                      
   os: "Windows 11"                              
   uses_gpu_for_inference: false                 
   has_network_during_ranking: false             
@@ -43,31 +43,30 @@ compute:
 # ============================================================================
 # AI tools declaration
 # ============================================================================
-# may verify these declarations against your code; declarations that contradict
-# your code or your interview are flagged.
 ai_tools_used:
   - "ChatGPT"
   - "Gemini"  
+  - "Antigravity"
 
 ai_usage_summary: |
-  Briefly describe how AI tools were used. 
-  - "Used ChatGPT and Gemini for autocomplete.
-     No candidate data was fed to any LLM."
-  - "Used ChatGPT to debug Python issues and Gemini for help."
+  Used ChatGPT and Gemini for debugging and code optimization.
+  Used Antigravity for implementing advanced honeypot detection logic, prestige tiering, 
+  and multi-factor heuristic ranking. No candidate data was fed to any LLM.
 
 # ============================================================================
 # Approach summary (optional but recommended)
 # ============================================================================
 methodology_summary: |
-  Unlike keyword-based systems that fall for "Honeypot" traps, our approach treats candidate profiles as multi-dimensional data structures. We prioritize proven engineering capability (via TF-IDF semantic vectorization) and real-world availability (via behavioral signal analysis), ensuring we find candidates who are actually ready to build, not just candidates who know how to spam keywords. 
-  "Runtime is ~30-60 seconds for 1 lakh candidates on CPU."
+  Our methodology implements a hybrid scoring system that combines TF-IDF semantic vectorization with multi-factor heuristic multipliers. We specifically address the "Honeypot" requirement by implementing ghost-worker detection, career-timeline validation, and junior-expert penalties. Additionally, we use Education Prestige (Tiering), GitHub Activity Signals, and Startup-specific experience boosts to ensure we find "Shipper" engineers who match the founding team's DNA. Runtime is optimized for CPU-only environments, processing 100k candidates in under 2 minutes.
 
 # ============================================================================
 # Declarations
 # ============================================================================
 declarations:
+  declarations:
   read_submission_spec: true        # I have read submission_spec.md in full
   code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
   no_collusion: true                # I have not coordinated my submission with other teams
   honeypot_check_done: false        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
   reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end
+

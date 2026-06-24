@@ -1,7 +1,5 @@
 
-data/
-*.jsonl
-*.gz
-*.csv
-
-docs/
+raw/
+.jsonl
+.gz
+.csv
