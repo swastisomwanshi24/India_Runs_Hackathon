@@ -9,10 +9,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm.auto import tqdm
 
-# --- COLAB DRIVE MOUNT (UNCOMMENT IF RUNNING IN COLAB) ---
-# from google.colab import drive
-# drive.mount('/content/drive')
-
 # --- CONFIGURATION ---
 # Change this to your project folder path
 PROJECT_FOLDER = './'  # Use './' for local VS Code, or '/content/drive/MyDrive/...' for Colab
