@@ -6,7 +6,7 @@ This system is a high-performance candidate discovery engine designed for the **
 ### Quick Links
 - **Google Colab Notebook**: [Run the Ranker in the Cloud](https://colab.research.google.com/drive/1hAZ3KAsmE1-pmAMmwl3tLYPnC-vufXXc?usp=sharing)
 - **Primary Script**: [rank.py](rank.py)
-- **Submission Output**: [submission.csv](data/final/submission.csv)
+- **Submission Output**: [submission.csv](data/final/submission_final.csv)
 
 ---
 
