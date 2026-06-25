@@ -1,0 +1,2 @@
+models/all-MiniLM-L6-v2/*.safetensors filter=lfs diff=lfs merge=lfs -text
+models/all-MiniLM-L6-v2/*.bin filter=lfs diff=lfs merge=lfs -text
